@@ -139,6 +139,8 @@ inline void Dictionary<TKey, TValue>::addItem(const TKey& key, const TValue& val
 		temp[i] = m_items[i];
 	temp[getCount()] = newItem;
 
+	m_count++;
+
 	delete[] m_items;
 	m_items = temp;
 }
@@ -147,7 +149,7 @@ template<typename TKey, typename TValue>
 inline bool Dictionary<TKey, TValue>::remove(const TKey key)
 {
 	bool wasRemoved = false;
-	if (containsKey(key))
+	if (!containsKey(key))
 		return false;
 
 	Item* temp = new Item[getCount() - 1];
@@ -158,7 +160,6 @@ inline bool Dictionary<TKey, TValue>::remove(const TKey key)
 			temp[i] = m_items[j];
 			j++;
 		}
-
 		else
 			wasRemoved = true;
 
@@ -175,7 +176,7 @@ template<typename TKey, typename TValue>
 inline bool Dictionary<TKey, TValue>::remove(const TKey key, TValue& value)
 {
 	bool wasRemoved = false;
-	if (containsKey(key))
+	if (!containsKey(key))
 		return false;
 
 	Item* temp = new Item[getCount() - 1];
@@ -205,12 +206,20 @@ inline bool Dictionary<TKey, TValue>::remove(const TKey key, TValue& value)
 template<typename TKey, typename TValue>
 inline const Dictionary<TKey, TValue> Dictionary<TKey, TValue>::operator=(const Dictionary<TKey, TValue>& other)
 {
+	Dictionary<TKey, TValue> temp;
 
-	return Dictionary<TKey, TValue>();
+	temp.m_count = other.m_count;
+	temp.m_items = m_items;
+
+	return temp;
 }
 
 template<typename TKey, typename TValue>
 inline TValue Dictionary<TKey, TValue>::operator[](const TKey key)
 {
+	for (int i = 0; i < getCount(); i++)
+		if (m_items[i].itemKey == key)
+			return m_items[i].itemValue;
+		
 	return TValue();
 }

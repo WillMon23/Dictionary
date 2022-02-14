@@ -14,7 +14,7 @@ private:
 public:
 	Dictionary() { m_items = nullptr, m_count = 0; };
 	Dictionary(const Dictionary<TKey, TValue>& other) { m_items = other.m_items, m_count = other.m_count;};
-	~Dictionary() { delete m_items; };
+	~Dictionary() { };
 
 	/// <summary>
 	/// Meant to clear the whole dictionary 
@@ -79,7 +79,7 @@ public:
 	/// </summary>
 	/// <param name="other">The comapred value</param>
 	/// <returns></returns>
-	const Dictionary<TKey, TValue> operator=(const Dictionary<TKey, TValue>& other);
+	const Dictionary<TKey, TValue>& operator=(const Dictionary<TKey, TValue>& other);
 
 	/// <summary>
 	/// Overrides 
@@ -98,8 +98,9 @@ private:
 template<typename TKey, typename TValue>
 inline void Dictionary<TKey, TValue>::clear()
 {
-	delete m_items;
+	delete[] m_items;
 	m_items = nullptr;
+	m_count = 0;
 }
 
 template<typename TKey, typename TValue>
@@ -155,17 +156,23 @@ inline bool Dictionary<TKey, TValue>::remove(const TKey key)
 	Item* temp = new Item[getCount() - 1];
 	int j = 0;
 	for (int i = 0; i < getCount(); i++)
+	{
 		if (m_items[i].itemKey != key)
 		{
 			temp[i] = m_items[j];
 			j++;
 		}
 		else
+		{
 			wasRemoved = true;
+			m_count--;
+		}
+		
+	}
 
 	if (wasRemoved)
 	{
-		delete[] m_items; 
+		delete m_items; 
 		m_items = temp;
 	}
 
@@ -196,7 +203,7 @@ inline bool Dictionary<TKey, TValue>::remove(const TKey key, TValue& value)
 
 	if (wasRemoved)
 	{
-		delete[] m_items;
+		delete m_items;
 		m_items = temp;
 	}
 
@@ -204,14 +211,17 @@ inline bool Dictionary<TKey, TValue>::remove(const TKey key, TValue& value)
 }
 
 template<typename TKey, typename TValue>
-inline const Dictionary<TKey, TValue> Dictionary<TKey, TValue>::operator=(const Dictionary<TKey, TValue>& other)
+inline const Dictionary<TKey, TValue>& Dictionary<TKey, TValue>::operator=(const Dictionary<TKey, TValue>& other)
 {
-	Dictionary<TKey, TValue> temp;
+	clear();
+	
+	Dictionary<TKey, TValue>* temp = new Dictionary<TKey, TValue>(other);
+	
+	m_count = temp->m_count;
 
-	temp.m_count = other.m_count;
-	temp.m_items = m_items;
+	m_items = temp->m_items;
 
-	return temp;
+	return  *temp;
 }
 
 template<typename TKey, typename TValue>

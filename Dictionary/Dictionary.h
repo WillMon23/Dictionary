@@ -98,26 +98,37 @@ private:
 template<typename TKey, typename TValue>
 inline void Dictionary<TKey, TValue>::clear()
 {
+	//deletes the items in the list
 	delete[] m_items;
+	//sets the item pointer to be a nullptr
 	m_items = nullptr;
+	//total list count 
 	m_count = 0;
 }
 
 template<typename TKey, typename TValue>
 inline const bool Dictionary<TKey, TValue>::containsKey(const TKey object)
 {
+	//for every index in the count 
 	for (int i = 0; i < getCount(); i++)
+		//if the item key at the index matches the object 
 		if (m_items[i].itemKey == object)
+			//returns true
 			return true;
+	//other wise it should end in false
 	return false;
 }
 
 template<typename TKey, typename TValue>
 inline const bool Dictionary<TKey, TValue>::containsValue(const TValue object)
 {
+	//for every index in the count 
 	for (int i = 0; i < getCount(); i++)
+		//if the item value at the index matches the object 
 		if (m_items[i].itemValue == object)
+			//returns true
 			return true;
+	//other wise it should end in false
 	return false;
 }
 

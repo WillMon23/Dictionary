@@ -14,7 +14,7 @@ private:
 public:
 	Dictionary() { m_items = nullptr, m_count = 0; };
 	Dictionary(const Dictionary<TKey, TValue>& other) { m_items = other.m_items, m_count = other.m_count;};
-	~Dictionary() { };
+	~Dictionary() { delete m_items; };
 
 	/// <summary>
 	/// Meant to clear the whole dictionary 
@@ -82,11 +82,12 @@ public:
 	const Dictionary<TKey, TValue>& operator=(const Dictionary<TKey, TValue>& other);
 
 	/// <summary>
-	/// Overrides 
+	/// Overrides braket to take in a key and in resposne get a value in return 
 	/// </summary>
 	/// <param name="key"></param>
 	/// <returns></returns>
 	TValue operator[](const TKey key);
+
 
 
 private: 
@@ -101,7 +102,7 @@ inline void Dictionary<TKey, TValue>::clear()
 	//deletes the items in the list
 	delete[] m_items;
 	//sets the item pointer to be a nullptr
-	m_items = nullptr;
+	m_items = new Item();
 	//total list count 
 	m_count = 0;
 }
@@ -124,10 +125,12 @@ inline const bool Dictionary<TKey, TValue>::containsValue(const TValue object)
 {
 	//for every index in the count 
 	for (int i = 0; i < getCount(); i++)
+	{
 		//if the item value at the index matches the object 
 		if (m_items[i].itemValue == object)
 			//returns true
 			return true;
+	}
 	//other wise it should end in false
 	return false;
 }
@@ -141,106 +144,162 @@ inline bool Dictionary<TKey, TValue>::tryGetValue(const TKey key, const TValue& 
 template<typename TKey, typename TValue>
 inline void Dictionary<TKey, TValue>::addItem(const TKey& key, const TValue& value)
 {
+	//Creats a temporay item adress holder 
 	Item* temp = new Item[getCount() + 1];
+	//Creats a new item
 	Item newItem = Item{};
-
+	//Sets the values of that item 
 	newItem.itemKey = key;
 	newItem.itemValue = value;
 
+	//For every item int current index 
 	for (int i = 0; i < getCount(); i++)
+		//set the item to be in the index of the temp array 
 		temp[i] = m_items[i];
+	//At the end of the index of the temp varaiable set it to be the new item
 	temp[getCount()] = newItem;
 
+	//Incrament  it by one 
 	m_count++;
-
+	
+	//Delete the the items in the currrent array of items 
 	delete[] m_items;
+	//Set it now to be the new set of items to be the current amount 
 	m_items = temp;
 }
 
 template<typename TKey, typename TValue>
 inline bool Dictionary<TKey, TValue>::remove(const TKey key)
 {
+	//Keeps tabs on the value changes 
 	bool wasRemoved = false;
+	//Checks if the key dose not exist in the items array
 	if (!containsKey(key))
+		//If not it just returns false
 		return false;
-
+	//Creats a temporary array of items 
 	Item* temp = new Item[getCount() - 1];
+	//a value to iterate through by starting at 0
 	int j = 0;
+	//at the index of in items 
 	for (int i = 0; i < getCount(); i++)
 	{
+		//if the item in that index is not equal to the key
 		if (m_items[i].itemKey != key)
 		{
+			//set the current in dex of i in the temp array to be that item at the index of j
 			temp[i] = m_items[j];
+			//incrament j by one
 			j++;
 		}
+		// else wise 
 		else
 		{
+			//Just say the item was removed 
 			wasRemoved = true;
+			//Then also decrament the count by one 
 			m_count--;
 		}
-		
 	}
 
+	//If the iteem was found and removed 
 	if (wasRemoved)
 	{
+		//Delete the the items in the currrent array of items
 		delete m_items; 
 		m_items = temp;
 	}
-
+	//Delete the the items in the currrent array of items
 	return wasRemoved;
 }
 
 template<typename TKey, typename TValue>
 inline bool Dictionary<TKey, TValue>::remove(const TKey key, TValue& value)
 {
+	//Keeps tabs on the value changes 
 	bool wasRemoved = false;
+	//Checks if the key dose not exist in the items array
 	if (!containsKey(key))
+		//If not it just returns false
 		return false;
-
+	//Creats a temporary array of items 
 	Item* temp = new Item[getCount() - 1];
+	//a value to iterate through by starting at 0
 	int j = 0;
+	//at the index of in items 
 	for (int i = 0; i < getCount(); i++)
+	{
+		//if the item in that index is not equal to the key
 		if (m_items[i].itemKey != key)
 		{
+			//set the current in dex of i in the temp array to be that item at the index of j
 			temp[i] = m_items[j];
+			//incrament j by one
 			j++;
 		}
-
+		// else wise 
 		else
 		{
+			//Just say the item was removed 
 			wasRemoved = true;
+			//Then also decrament the count by one 
+			m_count--;
 			value = m_items[i].itemValue;
 		}
+	}
 
+	//If the iteem was found and removed 
 	if (wasRemoved)
 	{
+		//Delete the the items in the currrent array of items
 		delete m_items;
 		m_items = temp;
 	}
-
+	//Delete the the items in the currrent array of items
 	return wasRemoved;
 }
 
 template<typename TKey, typename TValue>
 inline const Dictionary<TKey, TValue>& Dictionary<TKey, TValue>::operator=(const Dictionary<TKey, TValue>& other)
 {
+	//Checks to see if the list is empty 
+	if (other.m_count == 0)
+		//If the list is empty it just returns a emmpty dictonary 
+		return Dictionary<TKey, TValue>();
+	//Clears the current dictoanry 
 	clear();
 	
-	Dictionary<TKey, TValue>* temp = new Dictionary<TKey, TValue>(other);
+	//Sets the this dictonary count to be the other dictoanry list
+	m_count = other.m_count;
 	
-	m_count = temp->m_count;
+	//Creats a new Items array with the new count 
+	Item* temp = new Item[getCount()];
 
-	m_items = temp->m_items;
+	//for every item in the other array
+	for (int i = 0; i < other.m_count; i++)
+	{
+		//Creats a another item variable and gets it set to be the item in that other array
+		Item otherItem = other.m_items[i];
+		//Ssets the other item to be that item in the index of that temp array 
+		temp[i] = otherItem;
+	}
 
-	return  *temp;
+	//Sets to current array of items to be the new temp created 
+	m_items = temp;
+	//Retums this Dictonary
+	return  *this;
 }
 
 template<typename TKey, typename TValue>
 inline TValue Dictionary<TKey, TValue>::operator[](const TKey key)
 {
+	//For every item in the index
 	for (int i = 0; i < getCount(); i++)
+		//if the items key equals the the key in the argument
 		if (m_items[i].itemKey == key)
+			//Retun that items value int he array 
 			return m_items[i].itemValue;
 		
+	//other wise return a empty Value 
 	return TValue();
 }

@@ -14,7 +14,7 @@ int main() {
 	dictionary.addItem("Pom", 32);
 	dictionary.addItem("Lom", 13);
 
-	dictionary3.addItem(10, "Mod");
+	dictionary3.addItem(10, "Mom");
 	dictionary3.addItem(14, "Mof");
 	dictionary3.addItem(15, "Mog");
 	dictionary3.addItem(16, "Moh");
@@ -41,7 +41,7 @@ int main() {
 
 	std::cout << std::endl;
 
-	std::cout << "dic4 " << dictionary4[10] << std::endl;
+	std::cout << "dic4 " << dictionary4[dictionary["Mom"]] << std::endl;
 	std::cout << "dic4 " << dictionary4[14] << std::endl;
 	std::cout << "dic4 " << dictionary4[17] << std::endl;
 	std::cout << "dic4 " << dictionary4[16] << std::endl;
